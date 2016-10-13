@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insert title here</title>
+<script src="js/jquery.js"></script>
+<script src="js/seedrandom.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<style>
+body{
+	background-color:#fafad2;
+}
+#randomTable {
+    font-family: monospace;
+    font-size: 2.0em;
+}
+
+li {
+	font-size: 1.5em;
+}
+
+h1{
+	font-size: 4em;
+}
+.panel{
+	width:600px;
+	margin:0 auto;
+}
+#findPassword{
+	display:none;
+}
+#debug {
+	font-size:2em;
+	color: blue;	
+}
+
+</style>
+</head>
+<body>
+
+	<div class="container-fluid">
+		
+		<div class="page-header text-center">
+		  <h1>亂數表</h1>
+		</div>
+
+			
+		
+	
+			<div class="panel panel-success text-center">
+				<div class="panel-heading">
+                      	<h3 class="panel-title text-center">說明</h3>
+				</div>
+				<ul class="list-group list-group">
+					<li class="list-group-item">1.輸入數字編號選擇亂數表種類</li>
+					<li class="list-group-item">2.產生亂數表</li>
+					<li class="list-group-item">3.假設你輸入1234並選擇純數字亂數表</li>
+					<li class="list-group-item">4.密語13 31 62 18的對應密碼則為9348</li>
+					<li class="list-group-item">5.兩字元中第一字元是列，第二字元為行</li>
+				</ul>
+			</div>
+			
+
+			<hr/>
+		
+				
+	
+			<div class="text-center">
+				<label for="txtSeed">請輸入亂數表的編號：</label><a href="#txtSeed"><input type="text" id="txtSeed" value="1234" /></a>
+				&nbsp;<input type="button" class="btn btn-primary"  id="btnGo" value="產生亂數表" />
+				
+				</br>
+				<input type="button" class="btn btn-success" id="choose1" value="純數字" />
+				<input type="button" class="btn btn-success" id="choose2" value="數字+小寫字" />
+				<input type="button" class="btn btn-success" id="choose3" value="數字+大小寫字母" />
+	
+				<div  id="randomTable"></div>
+				<div id="findPassword">
+					<label for="find">輸入密語來尋找密碼:</label><input type="text" name="find" id="find"/>
+					<input type="button" class="btn btn-danger" id="goFind" value="尋找密碼">
+					<div id="debug"></div>
+				</div>
+
+			</div>
+		
+		
+			
+		
+		
+		
+		
+	</div>
+	
+	
+		
+
+	
+
+
+
+<script>
+var sPool = "0123456789";
+var result = "";
+var password = ""; //密碼
+
+//純數字
+$("#choose1").click(function(){
+	sPool ="0123456789";
+
+});
+
+//數字+小寫字
+$("#choose2").click(function(){
+	sPool ="abcdefghijkmnpqrstuvwxyz0123456789";
+});
+
+//數字+大小寫字母
+$("#choose3").click(function(){
+	sPool ="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz0123456789";
+});
+
+
+//產生亂數表
+$("#btnGo").click(function () {
+   
+    //初始化變數
+	result = "";
+	password = "";
+	$("#debug").html(password);  //去掉原本的結果
+
+    Math.seedrandom($("#txtSeed").val()); // 設定亂數種子
+	var iRandom = 0; var ch = "?";
+	for (iRow = 1; iRow <= 10; iRow++) {
+		var sLine = (iRow + 100).toString().substr(1, 2) + ": ";
+		for (iCol = 1; iCol <= 10; iCol++) {
+			iRandom = Math.floor(Math.random() * sPool.length);
+			ch = sPool.substr(iRandom, 1);
+			sLine += ch;
+		}
+		result += sLine + "<br>";
+	}
+	$("#randomTable").html(result);
+	$("#randomTable").css({	"margin":"0 auto",
+	"background-color": "#f0fff0",
+	"width":"300px",
+	"height":"400px"});
+	
+	//將尋找密碼的div顯示出來
+	$("#findPassword").css({"height":"450px","display":"block"});
+	
+	//捲動頁面
+	window.scroll(0,450) ;
+});
+
+//尋找密碼
+$("#goFind").click(function() {
+	var s = $("#find").val();
+	var row = 0;
+	var col = 0;
+	password = "密碼:";
+	
+	//判斷密語有無符合格式
+	var forDebug = true;
+	for(var i = 2; i<s.length; i+=3){
+		if(s[i] != " "){
+			forDebug = false;
+		}
+	}
+	
+	
+	
+	if(forDebug){
+		for(var i = 0; i <= s.length; i+=3) {
+			row = Number(s.substr(i,1));
+			col = Number(s.substr(i+1,1));
+	
+			password += result[3 + col+ 18*(row-1)] +" "; //3 + col+ 18*(row-1) 為密碼位址
+		}
+		$("#debug").html(password);
+		
+	}
+	else {
+		$("#debug").html("error");
+	}
+});
+
+
+
+
+</script>
+
+</body>
+</html>
